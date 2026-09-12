@@ -8,6 +8,8 @@ import config from './config/index.js';
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
 import AppError from './utils/AppError.js';
+import { apiLimiter, authLimiter } from './middleware/rateLimiter.js';
+import authRoutes from './routes/authRoutes.js';
 
 // ─── Initialize Express ─────────────────────────────────────
 const app = express();
@@ -60,8 +62,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// TODO: Mount route files here as we build them
-// app.use('/api/auth', authRoutes);
+// Apply general rate limiter to all API routes
+app.use('/api', apiLimiter);
+
+// Auth routes — stricter rate limit applied directly in the router
+// We apply authLimiter only on the mutation endpoints (login/register)
+app.use('/api/auth', authLimiter, authRoutes);
+
+// TODO: Mount more route files as we build them
 // app.use('/api/links', linkRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────
