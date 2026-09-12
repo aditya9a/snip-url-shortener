@@ -1,0 +1,27 @@
+import express from 'express';
+import * as linkController from '../controllers/linkController.js';
+import protect from '../middleware/auth.js';
+import validate from '../middleware/validate.js';
+import { createLinkSchema, updateLinkSchema } from '../validators/index.js';
+
+const router = express.Router();
+
+// ALL link routes require authentication
+router.use(protect);
+
+// POST /api/links
+router.post('/', validate(createLinkSchema), linkController.createLink);
+
+// GET /api/links
+router.get('/', linkController.getLinks);
+
+// GET /api/links/:id
+router.get('/:id', linkController.getLink);
+
+// PATCH /api/links/:id
+router.patch('/:id', validate(updateLinkSchema), linkController.updateLink);
+
+// DELETE /api/links/:id
+router.delete('/:id', linkController.deleteLink);
+
+export default router;

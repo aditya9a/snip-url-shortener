@@ -10,6 +10,7 @@ import errorHandler from './middleware/errorHandler.js';
 import AppError from './utils/AppError.js';
 import { apiLimiter, authLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/authRoutes.js';
+import linkRoutes from './routes/linkRoutes.js';
 
 // ─── Initialize Express ─────────────────────────────────────
 const app = express();
@@ -69,8 +70,8 @@ app.use('/api', apiLimiter);
 // We apply authLimiter only on the mutation endpoints (login/register)
 app.use('/api/auth', authLimiter, authRoutes);
 
-// TODO: Mount more route files as we build them
-// app.use('/api/links', linkRoutes);
+// Link management routes
+app.use('/api/links', linkRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────
 // This catches any request that doesn't match a defined route.
