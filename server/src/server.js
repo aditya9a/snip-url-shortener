@@ -11,6 +11,7 @@ import AppError from './utils/AppError.js';
 import { apiLimiter, authLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/authRoutes.js';
 import linkRoutes from './routes/linkRoutes.js';
+import redirectRoutes from './routes/redirectRoutes.js';
 
 // ─── Initialize Express ─────────────────────────────────────
 const app = express();
@@ -72,6 +73,11 @@ app.use('/api/auth', authLimiter, authRoutes);
 
 // Link management routes
 app.use('/api/links', linkRoutes);
+
+// Redirect engine and password unlock
+// Contains GET /:shortCode and POST /api/unlock/:shortCode
+// Must be mounted at root so GET /:shortCode works
+app.use('/', redirectRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────
 // This catches any request that doesn't match a defined route.
