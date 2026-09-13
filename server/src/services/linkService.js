@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid';
 import Link from '../models/Link.js';
 import AppError from '../utils/AppError.js';
-import { validateUrlSafety } from '../utils/urlSafety.js';
 
 // ─── Constants ──────────────────────────────────────────────
 
@@ -20,12 +19,6 @@ const generateShortCode = customAlphabet(alphabet, 8);
  */
 const createLink = async (userId, data) => {
   const { originalUrl, customAlias, title, tags, expiresAt, password } = data;
-
-  // URL safety check — blocks private IPs, recursive shortening, etc.
-  const safety = validateUrlSafety(originalUrl);
-  if (!safety.safe) {
-    throw new AppError(safety.reason, 400);
-  }
 
   let shortCode;
 

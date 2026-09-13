@@ -103,7 +103,13 @@ const startServer = async () => {
   });
 };
 
-startServer();
+// Only start the server automatically if we are not in a test environment
+// In tests, Supertest binds the app to an ephemeral port automatically.
+if (config.nodeEnv !== 'test') {
+  startServer();
+}
+
+export default app;
 
 // ─── Unhandled Rejection & Exception Handlers ────────────────
 // These are safety nets for errors that escape Express's error handling.
