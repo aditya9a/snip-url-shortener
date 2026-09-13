@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 import './index.css';
 
 // Layout Component (Navbar + Content area)
@@ -60,34 +62,7 @@ const Home = () => (
   </div>
 );
 
-const Dashboard = () => (
-  <div>
-    <div className="flex justify-between items-center mb-6">
-      <h2>Your Links</h2>
-      <button className="btn btn-primary">Create Link</button>
-    </div>
-    <div className="card table-container">
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Original URL</th>
-            <th>Short Link</th>
-            <th>Clicks</th>
-            <th>Created</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colSpan="5" className="text-center text-tertiary" style={{ padding: '3rem' }}>
-              You haven't created any links yet.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
+
 
 // We need an inner app component because useAuth and useNavigate must be used inside a Router context.
 const AppContent = () => (
@@ -101,6 +76,7 @@ const AppContent = () => (
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:id/analytics" element={<Analytics />} />
         </Route>
       </Routes>
     </Layout>
