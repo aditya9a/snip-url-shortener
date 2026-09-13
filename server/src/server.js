@@ -3,6 +3,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import config from './config/index.js';
 import connectDB from './config/db.js';
@@ -78,6 +80,26 @@ app.use('/api/links', linkRoutes);
 // Contains GET /:shortCode and POST /api/unlock/:shortCode
 // Must be mounted at root so GET /:shortCode works
 app.use('/', redirectRoutes);
+
+// ─── Production Setup: Serve React Frontend ────────────────────
+
+if (config.isProd) {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  
+  // Serve static files from the React app build directory
+  app.use(express.static(path.join(__dirname, '../../client/dist')));
+  
+  // The catch-all handler: for any request that doesn't match an API route,
+  // send back React's index.html file so client-side routing works.
+  app.get('*', (req, res, next) => {
+    // Exclude /api routes from this fallback so they hit the 404 handler below
+    if (req.originalUrl.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.resolve(__dirname, '../../client/dist', 'index.html'));
+  });
+}
 
 // ─── 404 Handler ─────────────────────────────────────────────
 // This catches any request that doesn't match a defined route.
