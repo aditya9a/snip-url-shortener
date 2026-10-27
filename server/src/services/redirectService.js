@@ -3,6 +3,23 @@ import { UAParser } from 'ua-parser-js';
 import Link from '../models/Link.js';
 import Click from '../models/Click.js';
 
+const getLocation = (requestIp) => {
+  // x-forwarded-for can contain a chain of addresses; the first is the client.
+  const ip = String(requestIp || '').split(',')[0].trim();
+  const isLoopback = ip === '::1' || ip === '127.0.0.1' || ip === '::ffff:127.0.0.1';
+  const isPrivateIpv4 = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(ip);
+
+  if (isLoopback || isPrivateIpv4) {
+    return { country: 'Local / Private Network', city: 'Local' };
+  }
+
+  const geo = geoip.lookup(ip);
+  return {
+    country: geo?.country || 'Location unavailable',
+    city: geo?.city || 'Location unavailable',
+  };
+};
+
 /**
  * Handles the background processing of a click event.
  * We do not await this function in the request cycle.
@@ -13,9 +30,7 @@ const recordAnalytics = async (linkId, req) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     // 2. Parse Geo Data
-    const geo = geoip.lookup(ip);
-    const country = geo?.country || 'Unknown';
-    const city = geo?.city || 'Unknown';
+    const { country, city } = getLocation(ip);
 
     // 3. Parse User-Agent
     const uaString = req.headers['user-agent'] || '';

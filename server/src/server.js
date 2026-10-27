@@ -18,6 +18,12 @@ import redirectRoutes from './routes/redirectRoutes.js';
 // ─── Initialize Express ─────────────────────────────────────
 const app = express();
 
+// Render sits behind a reverse proxy. Trust the first proxy so IP-based rate
+// limits and request metadata use the actual visitor rather than the proxy.
+if (config.isProd) {
+  app.set('trust proxy', 1);
+}
+
 // ─── Middleware Pipeline ────────────────────────────────────
 // ORDER MATTERS. Each middleware processes the request in sequence.
 
@@ -76,11 +82,6 @@ app.use('/api/auth', authLimiter, authRoutes);
 // Link management routes
 app.use('/api/links', linkRoutes);
 
-// Redirect engine and password unlock
-// Contains GET /:shortCode and POST /api/unlock/:shortCode
-// Must be mounted at root so GET /:shortCode works
-app.use('/', redirectRoutes);
-
 // ─── Production Setup: Serve React Frontend ────────────────────
 
 if (config.isProd) {
@@ -89,17 +90,19 @@ if (config.isProd) {
   
   // Serve static files from the React app build directory
   app.use(express.static(path.join(__dirname, '../../client/dist')));
-  
-  // The catch-all handler: for any request that doesn't match an API route,
-  // send back React's index.html file so client-side routing works.
-  app.get('*', (req, res, next) => {
-    // Exclude /api routes from this fallback so they hit the 404 handler below
-    if (req.originalUrl.startsWith('/api')) {
-      return next();
-    }
+
+  // Serve known client-side routes before the one-segment short-code route.
+  // This keeps direct visits to /dashboard from being treated as a short URL.
+  const serveFrontend = (req, res) =>
     res.sendFile(path.resolve(__dirname, '../../client/dist', 'index.html'));
-  });
+  app.get(['/login', '/register', '/dashboard', '/dashboard/:id/analytics'], serveFrontend);
 }
+
+// Redirect engine and password unlock
+// Contains GET /:shortCode and POST /api/unlock/:shortCode
+// This must come after production SPA routes so those routes are not confused
+// with one-segment short URLs.
+app.use('/', redirectRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────
 // This catches any request that doesn't match a defined route.

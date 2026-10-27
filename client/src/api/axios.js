@@ -5,7 +5,7 @@ const api = axios.create({
   // Use Vite's environment variables (import.meta.env)
   // In development, this points to our Express server.
   // In production, it will be the real domain.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   
   // CRITICAL: Tells Axios to send cookies (like our HTTP-only JWT) with every request
   withCredentials: true,

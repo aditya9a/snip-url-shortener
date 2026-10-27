@@ -103,7 +103,12 @@ const Analytics = () => {
           <h3 className="mb-4">Top Countries</h3>
           {analytics.geographic.length > 0 ? (
             analytics.geographic.map(geo => (
-              <ProgressBar key={geo.country} label={geo.country} count={geo.clicks} max={maxCountry} />
+              <ProgressBar
+                key={geo.country}
+                label={geo.country === 'Unknown' ? 'Location unavailable' : geo.country}
+                count={geo.clicks}
+                max={maxCountry}
+              />
             ))
           ) : (
             <p className="text-secondary text-sm">No geographic data yet.</p>

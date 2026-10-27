@@ -90,7 +90,7 @@ const Dashboard = () => {
               </tr>
             ) : (
               links.map((link) => (
-                <tr key={link._id}>
+                <tr key={link.id}>
                   <td>
                     <div className="font-medium text-primary">
                       <a href={`${getBaseUrl()}/${link.shortCode}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'var(--primary-solid)' }}>
@@ -110,10 +110,10 @@ const Dashboard = () => {
                   </td>
                   <td>
                     <div className="flex gap-2">
-                      <Link to={`/dashboard/${link._id}/analytics`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                      <Link to={`/dashboard/${link.id}/analytics`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
                         Stats
                       </Link>
-                      <button onClick={() => handleDelete(link._id)} className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                      <button onClick={() => handleDelete(link.id)} className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
                         Delete
                       </button>
                     </div>

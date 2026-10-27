@@ -22,7 +22,7 @@ const Register = () => {
       if (err.response?.data?.errors) {
         setError(err.response.data.errors.map(e => e.message).join(', '));
       } else {
-        setError(err.response?.data?.message || 'Failed to register');
+        setError(err.response?.data?.message || err.message || 'Failed to register');
       }
     } finally {
       setIsSubmitting(false);

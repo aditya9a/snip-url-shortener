@@ -17,7 +17,9 @@ const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 
   // Client
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // Render supplies RENDER_EXTERNAL_URL automatically at runtime. CLIENT_URL
+  // still takes priority so custom domains can be configured explicitly.
+  clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
 
   // Derived
   get isDev() {

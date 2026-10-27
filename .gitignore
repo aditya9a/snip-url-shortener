@@ -25,3 +25,6 @@ Thumbs.db
 
 # Coverage reports
 coverage/
+
+# Local MongoDB data used only for development
+.mongo-data/
