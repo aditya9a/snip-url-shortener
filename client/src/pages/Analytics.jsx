@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
+import { getApiOrigin, getShortUrl } from '../utils/urls';
 
 const ProgressBar = ({ label, count, max }) => {
   const percentage = max > 0 ? (count / max) * 100 : 0;
@@ -72,8 +73,8 @@ const Analytics = () => {
           <h2 className="text-2xl mb-1">{link.title || 'Untitled Link'}</h2>
           <p className="text-secondary mb-2" style={{ wordBreak: 'break-all' }}>{link.originalUrl}</p>
           <div className="flex items-center gap-4">
-            <a href={`http://localhost:5000/${link.shortCode}`} target="_blank" rel="noreferrer" className="text-primary font-medium" style={{ textDecoration: 'none' }}>
-              snip.io/{link.shortCode}
+            <a href={getShortUrl(link.shortCode)} target="_blank" rel="noreferrer" className="text-primary font-medium" style={{ textDecoration: 'none' }}>
+              {getShortUrl(link.shortCode)}
             </a>
             <span className="text-tertiary text-sm">Created {new Date(link.createdAt).toLocaleDateString()}</span>
           </div>
@@ -82,7 +83,7 @@ const Analytics = () => {
         {qrCode && (
           <div className="card p-2 text-center">
             <img src={qrCode} alt="QR Code" style={{ width: '100px', height: '100px' }} />
-            <a href={`http://localhost:5000/api/links/${link.id}/qr/download`} className="text-xs text-primary mt-1 block" download>
+            <a href={`${getApiOrigin()}/links/${link.id}/qr/download`} className="text-xs text-primary mt-1 block" download>
               Download
             </a>
           </div>

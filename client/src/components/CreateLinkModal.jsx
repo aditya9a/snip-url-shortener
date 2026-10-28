@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
+import { getAppOrigin } from '../utils/urls';
 
 const CreateLinkModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({ originalUrl: '', customAlias: '', title: '', password: '' });
@@ -85,7 +86,7 @@ const CreateLinkModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="form-group mb-6">
             <label className="form-label" htmlFor="customAlias">Custom Alias (Optional)</label>
             <div className="flex items-center">
-              <span className="text-secondary mr-2">snip.io/</span>
+              <span className="text-secondary mr-2">{getAppOrigin()}/</span>
               <input 
                 id="customAlias"
                 type="text" 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import CreateLinkModal from '../components/CreateLinkModal';
+import { getShortUrl } from '../utils/urls';
 
 const Dashboard = () => {
   const [links, setLinks] = useState([]);
@@ -39,11 +40,6 @@ const Dashboard = () => {
     } catch (err) {
       alert('Failed to delete link.');
     }
-  };
-
-  // Helper to get the base domain for display
-  const getBaseUrl = () => {
-    return import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
   };
 
   return (
@@ -93,8 +89,8 @@ const Dashboard = () => {
                 <tr key={link.id}>
                   <td>
                     <div className="font-medium text-primary">
-                      <a href={`${getBaseUrl()}/${link.shortCode}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'var(--primary-solid)' }}>
-                        snip.io/{link.shortCode}
+                      <a href={getShortUrl(link.shortCode)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'var(--primary-solid)' }}>
+                        {getShortUrl(link.shortCode)}
                       </a>
                     </div>
                     {link.title && <div className="text-xs text-secondary mt-1">{link.title}</div>}
