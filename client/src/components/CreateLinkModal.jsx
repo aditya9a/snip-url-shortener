@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import api from '../api/axios';
 
 const CreateLinkModal = ({ isOpen, onClose, onSuccess }) => {
-  const [formData, setFormData] = useState({ originalUrl: '', customAlias: '', title: '' });
+  const [formData, setFormData] = useState({ originalUrl: '', customAlias: '', title: '', password: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,11 +18,12 @@ const CreateLinkModal = ({ isOpen, onClose, onSuccess }) => {
       const payload = { originalUrl: formData.originalUrl };
       if (formData.customAlias.trim()) payload.customAlias = formData.customAlias.trim();
       if (formData.title.trim()) payload.title = formData.title.trim();
+      if (formData.password) payload.password = formData.password;
 
       await api.post('/links', payload);
       
       // Reset form
-      setFormData({ originalUrl: '', customAlias: '', title: '' });
+      setFormData({ originalUrl: '', customAlias: '', title: '', password: '' });
       onSuccess(); // Refresh the list
       onClose(); // Close modal
     } catch (err) {
@@ -97,6 +98,22 @@ const CreateLinkModal = ({ isOpen, onClose, onSuccess }) => {
               />
             </div>
             <span className="text-tertiary text-sm mt-1">Leave blank for a random short code.</span>
+          </div>
+
+          <div className="form-group mb-6">
+            <label className="form-label" htmlFor="linkPassword">Password (Optional)</label>
+            <input
+              id="linkPassword"
+              type="password"
+              className="input"
+              placeholder="At least 4 characters"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              minLength={4}
+              maxLength={72}
+              autoComplete="new-password"
+            />
+            <span className="text-tertiary text-sm mt-1">Visitors will need this password before they can open the destination.</span>
           </div>
 
           <div className="flex justify-between">

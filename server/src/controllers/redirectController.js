@@ -1,5 +1,6 @@
 import redirectService from '../services/redirectService.js';
 import config from '../config/index.js';
+import Link from '../models/Link.js';
 
 /**
  * Handles the actual redirection.
@@ -49,10 +50,22 @@ export const unlockLink = async (req, res) => {
     const { password } = req.body;
 
     // Must explicitly select password for comparison
-    const link = await import('../models/Link.js').then(m => m.default.findOne({ shortCode }).select('+password'));
+    const link = await Link.findOne({ shortCode }).select('+password');
 
     if (!link || !link.isActive) {
       return res.status(404).json({ success: false, message: 'Link not found or disabled' });
+    }
+
+    if (link.expiresAt && link.expiresAt < new Date()) {
+      return res.status(410).json({ success: false, message: 'This link has expired' });
+    }
+
+    if (!link.password) {
+      return res.status(400).json({ success: false, message: 'This link does not require a password' });
+    }
+
+    if (typeof password !== 'string' || password.length === 0) {
+      return res.status(400).json({ success: false, message: 'Password is required' });
     }
 
     const isMatch = await link.comparePassword(password);
@@ -71,6 +84,7 @@ export const unlockLink = async (req, res) => {
     });
 
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Unlock Error:', err);
+    return res.status(500).json({ success: false, message: 'Unable to unlock this link' });
   }
 };

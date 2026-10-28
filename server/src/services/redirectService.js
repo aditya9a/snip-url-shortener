@@ -70,7 +70,9 @@ const recordAnalytics = async (linkId, req) => {
  * Validates a link and returns it. Throws if disabled or expired.
  */
 const getValidLink = async (shortCode) => {
-  const link = await Link.findOne({ shortCode });
+  // Password is select:false on the schema, so include it here to decide
+  // whether a visitor must unlock the link before being redirected.
+  const link = await Link.findOne({ shortCode }).select('+password');
 
   if (!link) {
     return { error: 'not_found' };

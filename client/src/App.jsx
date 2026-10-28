@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
+import Unlock from './pages/Unlock';
 import './index.css';
 
 // Layout Component (Navbar + Content area)
@@ -72,6 +73,7 @@ const AppContent = () => (
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/unlock/:shortCode" element={<Unlock />} />
         
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>

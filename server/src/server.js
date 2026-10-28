@@ -95,7 +95,7 @@ if (config.isProd) {
   // This keeps direct visits to /dashboard from being treated as a short URL.
   const serveFrontend = (req, res) =>
     res.sendFile(path.resolve(__dirname, '../../client/dist', 'index.html'));
-  app.get(['/login', '/register', '/dashboard', '/dashboard/:id/analytics'], serveFrontend);
+  app.get(['/login', '/register', '/dashboard', '/dashboard/:id/analytics', '/unlock/:shortCode'], serveFrontend);
 }
 
 // Redirect engine and password unlock
