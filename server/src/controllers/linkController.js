@@ -20,10 +20,7 @@ export const createLink = asyncHandler(async (req, res) => {
 
 // GET /api/links
 export const getLinks = asyncHandler(async (req, res) => {
-  // Extract query params for pagination and search
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const search = req.query.search || '';
+  const { page, limit, search } = req.validatedQuery;
 
   const result = await linkService.getUserLinks(req.user._id, page, limit, search);
 

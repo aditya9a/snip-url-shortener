@@ -20,6 +20,13 @@ const config = {
   // Render supplies RENDER_EXTERNAL_URL automatically at runtime. CLIENT_URL
   // still takes priority so custom domains can be configured explicitly.
   clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
+  // Canonical origin used in QR codes and other public short-link URLs.
+  // Set SHORT_URL_BASE_URL for a custom domain; Render's service URL is the
+  // production fallback. Locally, short links are served by Express on PORT.
+  shortUrlBaseUrl: process.env.SHORT_URL_BASE_URL || process.env.RENDER_EXTERNAL_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? process.env.CLIENT_URL || 'http://localhost:5000'
+      : `http://localhost:${process.env.PORT || 5000}`),
 
   // Derived
   get isDev() {

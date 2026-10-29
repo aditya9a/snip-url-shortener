@@ -21,49 +21,41 @@ const getLocation = (requestIp) => {
 };
 
 /**
- * Handles the background processing of a click event.
- * We do not await this function in the request cycle.
+ * Persist a click before returning the redirect response. This adds a database
+ * round trip to redirects, but avoids losing acknowledged clicks on shutdown.
  */
 const recordAnalytics = async (linkId, req) => {
-  try {
-    // 1. Get the IP (handles proxies/load balancers properly)
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  // 1. Get the IP (handles proxies/load balancers properly)
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // 2. Parse Geo Data
-    const { country, city } = getLocation(ip);
+  // 2. Parse Geo Data
+  const { country, city } = getLocation(ip);
 
-    // 3. Parse User-Agent
-    const uaString = req.headers['user-agent'] || '';
-    const parser = new UAParser(uaString);
-    
-    // Determine device type (UAParser returns undefined for desktop by default)
-    const deviceType = parser.getDevice().type || 'desktop';
-    
-    // Determine browser and OS
-    const browser = parser.getBrowser().name || 'Unknown';
-    const os = parser.getOS().name || 'Unknown';
+  // 3. Parse User-Agent
+  const uaString = req.headers['user-agent'] || '';
+  const parser = new UAParser(uaString);
+  // Determine device type (UAParser returns undefined for desktop by default)
+  const deviceType = parser.getDevice().type || 'desktop';
+  // Determine browser and OS
+  const browser = parser.getBrowser().name || 'Unknown';
+  const os = parser.getOS().name || 'Unknown';
 
-    // 4. Get Referrer
-    const referrer = req.headers.referer || req.headers.referrer || 'Direct';
+  // 4. Get Referrer
+  const referrer = req.headers.referer || req.headers.referrer || 'Direct';
 
-    // 5. Save the click event
-    await Click.create({
-      link: linkId,
-      country,
-      city,
-      device: deviceType,
-      browser,
-      os,
-      referrer,
-    });
+  // 5. Save the click event
+  await Click.create({
+    link: linkId,
+    country,
+    city,
+    device: deviceType,
+    browser,
+    os,
+    referrer,
+  });
 
-    // 6. Increment the denormalized totalClicks counter on the Link document
-    await Link.updateOne({ _id: linkId }, { $inc: { totalClicks: 1 } });
-    
-  } catch (error) {
-    // We log it, but since this runs asynchronously, it won't crash the request
-    console.error('Failed to record analytics:', error);
-  }
+  // 6. Increment the denormalized totalClicks counter on the Link document
+  await Link.updateOne({ _id: linkId }, { $inc: { totalClicks: 1 } });
 };
 
 /**

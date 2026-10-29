@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import Link from '../models/Link.js';
+import Click from '../models/Click.js';
 import AppError from '../utils/AppError.js';
 
 // ─── Constants ──────────────────────────────────────────────
@@ -144,6 +145,8 @@ const updateLink = async (userId, linkId, updateData) => {
  */
 const deleteLink = async (userId, linkId) => {
   const link = await getLinkById(userId, linkId);
+  // Remove event documents explicitly; MongoDB references do not cascade.
+  await Click.deleteMany({ link: link._id });
   await link.deleteOne();
   return true;
 };

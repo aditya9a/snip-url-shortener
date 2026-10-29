@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import Link from '../models/Link.js';
 import AppError from '../utils/AppError.js';
+import config from '../config/index.js';
 
 /**
  * Generates a QR code PNG as a data URL or buffer.
@@ -20,9 +21,8 @@ const generateQR = async (userId, linkId) => {
     throw new AppError('Link not found or unauthorized.', 404);
   }
 
-  // Encode the destination directly so a QR scan never depends on the local
-  // redirect server being reachable.
-  const shortUrl = link.originalUrl;
+  // Encode the short URL so QR scans pass through the redirect and are tracked.
+  const shortUrl = `${config.shortUrlBaseUrl.replace(/\/+$/, '')}/${encodeURIComponent(link.shortCode)}`;
 
   // Generate QR as a data URL (base64-encoded PNG)
   const qrDataUrl = await QRCode.toDataURL(shortUrl, {
@@ -52,9 +52,8 @@ const generateQRBuffer = async (userId, linkId) => {
     throw new AppError('Link not found or unauthorized.', 404);
   }
 
-  // Keep downloaded QR codes consistent with the preview: both point straight
-  // to the destination URL rather than to a local redirect endpoint.
-  const shortUrl = link.originalUrl;
+  // Keep downloads consistent with the preview and preserve click tracking.
+  const shortUrl = `${config.shortUrlBaseUrl.replace(/\/+$/, '')}/${encodeURIComponent(link.shortCode)}`;
 
   const buffer = await QRCode.toBuffer(shortUrl, {
     width: 600,

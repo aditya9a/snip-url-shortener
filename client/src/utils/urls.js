@@ -6,6 +6,9 @@ const trimTrailingSlash = (value) => value.replace(/\/+$/, '');
 export const getAppOrigin = () => {
   const configuredOrigin = import.meta.env.VITE_APP_URL;
   if (configuredOrigin) return trimTrailingSlash(configuredOrigin);
+  if (import.meta.env.DEV) {
+    return `${window.location.protocol}//${window.location.hostname}:5000`;
+  }
   return window.location.origin;
 };
 

@@ -141,4 +141,23 @@ export const analyticsQuerySchema = z.object({
     .enum(['hour', 'day', 'week', 'month'])
     .optional()
     .default('day'),
+}).superRefine((query, context) => {
+  if (Boolean(query.startDate) !== Boolean(query.endDate)) {
+    context.addIssue({ code: 'custom', path: ['endDate'], message: 'Provide both startDate and endDate, or neither' });
+  }
+
+  if (query.startDate && query.endDate) {
+    const rangeMs = new Date(query.endDate).getTime() - new Date(query.startDate).getTime();
+    if (rangeMs < 0) {
+      context.addIssue({ code: 'custom', path: ['endDate'], message: 'End date must be on or after start date' });
+    } else if (rangeMs > 366 * 24 * 60 * 60 * 1000) {
+      context.addIssue({ code: 'custom', path: ['endDate'], message: 'Date range cannot exceed 366 days' });
+    }
+  }
+});
+
+export const linksQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).max(100000).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  search: z.string().trim().max(200).optional().default(''),
 });

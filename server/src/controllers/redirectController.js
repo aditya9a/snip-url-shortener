@@ -26,9 +26,15 @@ export const handleRedirect = async (req, res) => {
       return res.redirect(302, `${config.clientUrl}/unlock/${shortCode}`);
     }
 
-    // ─── Analytics Capture (Fire and Forget) ───
-    // We do NOT await this. We let it run in the background.
-    redirectService.recordAnalytics(link._id, req);
+    // Record the click durably before acknowledging the redirect. If analytics
+    // storage is unavailable, return a retryable response instead of silently
+    // dropping the event.
+    try {
+      await redirectService.recordAnalytics(link._id, req);
+    } catch (analyticsError) {
+      console.error('Failed to record redirect click:', analyticsError);
+      return res.status(503).set('Retry-After', '5').send('Click tracking is temporarily unavailable. Please retry.');
+    }
 
     // ─── The Actual Redirect ───
     // 302 ensures the browser doesn't cache it, so we always capture clicks.
@@ -75,7 +81,12 @@ export const unlockLink = async (req, res) => {
     }
 
     // Capture analytics on successful unlock
-    redirectService.recordAnalytics(link._id, req);
+    try {
+      await redirectService.recordAnalytics(link._id, req);
+    } catch (analyticsError) {
+      console.error('Failed to record unlocked click:', analyticsError);
+      return res.status(503).json({ success: false, message: 'Click tracking is temporarily unavailable. Please retry.' });
+    }
 
     // Return the original URL so the frontend can manually window.location.href to it
     return res.status(200).json({

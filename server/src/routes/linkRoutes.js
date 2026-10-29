@@ -3,8 +3,8 @@ import * as linkController from '../controllers/linkController.js';
 import * as analyticsController from '../controllers/analyticsController.js';
 import * as qrController from '../controllers/qrController.js';
 import protect from '../middleware/auth.js';
-import validate from '../middleware/validate.js';
-import { createLinkSchema, updateLinkSchema } from '../validators/index.js';
+import validate, { validateQuery } from '../middleware/validate.js';
+import { analyticsQuerySchema, createLinkSchema, linksQuerySchema, updateLinkSchema } from '../validators/index.js';
 
 const router = express.Router();
 
@@ -15,13 +15,13 @@ router.use(protect);
 router.post('/', validate(createLinkSchema), linkController.createLink);
 
 // GET /api/links
-router.get('/', linkController.getLinks);
+router.get('/', validateQuery(linksQuerySchema), linkController.getLinks);
 
 // GET /api/links/:id
 router.get('/:id', linkController.getLink);
 
 // GET /api/links/:id/analytics
-router.get('/:id/analytics', analyticsController.getLinkAnalytics);
+router.get('/:id/analytics', validateQuery(analyticsQuerySchema), analyticsController.getLinkAnalytics);
 
 // GET /api/links/:id/qr
 router.get('/:id/qr', qrController.getQRCode);
