@@ -94,6 +94,20 @@ cd server
 npm test
 ```
 
+## Production uptime monitor
+
+The GitHub Actions workflow at `.github/workflows/keep-render-awake.yml` pings
+the production health endpoint every 10 minutes. This prevents a free Render
+web service from becoming idle. Before enabling it, add a repository variable
+named `RENDER_HEALTH_URL` under **Settings → Secrets and variables → Actions →
+Variables**, with a value such as:
+
+```text
+https://your-service.onrender.com/api/health
+```
+
+The workflow can also be run manually from the repository's **Actions** tab.
+
 ## API Documentation
 
 | Method | Endpoint | Description | Auth Required |
